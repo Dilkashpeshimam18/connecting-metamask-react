@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import MetamaskConnect from './MetamaskConnect/MetamaskConnect';
+import MetamaskConnect from './components/MetamaskConnect/MetamaskConnect';
 
 function App() {
   return (
