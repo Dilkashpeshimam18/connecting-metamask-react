@@ -20,45 +20,47 @@ const MetamaskConnect = () => {
     const connectMetamask = async () => {
         try {
             const currentProvider = detectProvider()
+            console.log(currentProvider)
             if (currentProvider) {
                 if (currentProvider !== window.ethereum) {
                     console.log(
                         'Non-Ethereum browser detected. You should consider trying MetaMask!'
                     );
                 }
+                if (window.ethereum) {
+                    await window.ethereum.enable();
+                }
+                let account;
+                await currentProvider.request({ method: 'eth_requestAccounts' }).then((accounts) => {
+                    account = accounts[0]
+                })
+                saveUserData(account)
+
+
             }
-            await currentProvider.request({ method: 'eth_requestAccounts' })
-            const web3 = new Web3(currentProvider)
-            let userAccount = web3.eth.getAccounts()
-            let account = userAccount[0]
-            const chainId = web3.eth.getChainId()
-            let ethBalance = web3.eth.getBalance(account)
-            ethBalance = web3.utils.fromWei(ethBalance, 'ether')
-            saveUserData(ethBalance, account, chainId)
-            if (userAccount.length === 0) {
-                console.log('Please connect to meta mask');
-            }
+
         } catch (err) {
-            console.log('There was an error fetching your accounts. Make sure your Ethereum client is configured correctly.'
-            )
+            console.log(err)
         }
     }
 
-    const saveUserData = (balance, account, chainId) => {
+    const saveUserData = (account) => {
         let user = {
             account: account,
-            balance: balance,
-            connectionid: chainId,
+
         }
+        console.log(user)
         localStorage.setItem('userAccount', JSON.stringify(user))
         const userData = JSON.parse(localStorage.getItem('userAccount'))
         setUserInfo(userData)
         setIsConnected(true);
 
     }
+
     return (
         <div>
             <button onClick={connectMetamask}>Connect to Metamsk</button>
+            {userInfo && <p>{userInfo.account}</p>}
 
         </div>
     )
